@@ -18,8 +18,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Clean Install Dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build Application
         run: npm run build
@@ -34,8 +36,8 @@ jobs:
           script: |
             cd /mnt/newvolume/real-estate
             git pull origin main
+            rm -rf node_modules package-lock.json
             npm install
             npm run build
             pm2 restart landliya
-                                       
 
