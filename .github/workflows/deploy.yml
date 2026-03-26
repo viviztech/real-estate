@@ -1,4 +1,4 @@
-name: Real Estate CI/CD Pipeline
+name: CI/CD Pipeline - Staging
 
 on:
   push:
@@ -6,13 +6,23 @@ on:
       - main
 
 jobs:
-  deploy:
-    name: Build and Deploy to Staging
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Application
+        run: npm run build
 
       - name: Deploy to Staging Server
         uses: appleboy/ssh-action@v1.0.3
@@ -20,8 +30,12 @@ jobs:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
+          port: 22
           script: |
             cd /mnt/newvolume/real-estate
             git pull origin main
-            docker compose down
-            docker compose up -d --build
+            npm install
+            npm run build
+            pm2 restart landliya
+                                       
+
