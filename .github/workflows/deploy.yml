@@ -16,12 +16,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: npm
 
-      - name: Clean Install Dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Build Application
         run: npm run build
@@ -36,8 +35,7 @@ jobs:
           script: |
             cd /mnt/newvolume/real-estate
             git pull origin main
-            rm -rf node_modules package-lock.json
-            npm install
+            npm ci
             npm run build
             pm2 restart landliya
 
