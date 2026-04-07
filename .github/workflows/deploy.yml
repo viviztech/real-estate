@@ -10,21 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Step 2: Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
+      # Step 3: Install dependencies locally (for GitHub Actions build)
       - name: Install Dependencies
         run: npm ci
 
+      # Step 4: Build project locally (optional, ensures no build errors)
       - name: Build Application
         run: npm run build
 
+      # Step 5: Deploy to staging server
       - name: Deploy to Staging Server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -33,9 +38,12 @@ jobs:
           key: ${{ secrets.STAGING_SSH_KEY }}
           port: 22
           script: |
+            echo "Deploying Real Estate frontend..."
             cd /mnt/newvolume/real-estate
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/main
             npm ci
             npm run build
-            pm2 restart landliya
+            pm2 reload ecosystem.config.js
+            pm2 status
 
